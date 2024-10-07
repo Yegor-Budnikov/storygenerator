@@ -59,7 +59,7 @@ app.post('/generate-story', async (req, res) => {
                     { role: 'system', content: 'You are a helpful assistant that writes creative stories.' },  // Optional system message
                     { role: 'user', content: prompt }  // User-provided prompt for the story
                 ],
-                max_tokens: 200,
+                max_tokens: 500,
             },
             {
                 headers: {
