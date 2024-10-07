@@ -11,16 +11,6 @@
             margin: 20px auto;
             text-align: center;
         }
-        .hello {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-weight: bold;
-            background-color: #f0f0f0;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
         textarea, input[type="button"] {
             width: 100%;
             padding: 10px;
@@ -37,11 +27,11 @@
 </head>
 <body>
     <h1>Welcome to the Story Generator</h1>
-    <div id="hello" class="hello">Hello world :)</div>
     <p>Enter a prompt below and click "Generate Story" to get a response:</p>
     <textarea id="prompt" rows="5" placeholder="Enter your prompt here..."></textarea>
     <input type="button" value="Generate Story" onclick="generateStory()">
     <div id="output">The story will appear here...</div>
+    <input type="button" value="Copy to Clipboard" onclick="copyToClipboard()">
 
     <script>
 
@@ -90,6 +80,17 @@
             } else {
                 outputDiv.textContent = 'No story generated. Please try again.';
             }
+        }
+        // Function to copy the generated story to clipboard
+        function copyToClipboard() {
+            const storyText = document.getElementById('output').textContent;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = storyText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('Story copied to clipboard!');
         }
 
     </script>
