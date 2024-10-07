@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple ChatGPT Web App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .hello {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-weight: bold;
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea, input[type="button"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        #output {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 250px;  /* Keep a fixed height */
+            overflow-y: auto;  /* Add a scrollbar when the content exceeds the height */
+            white-space: pre-wrap;  /* Preserve spaces and line breaks */
+    }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Story Generator</h1>
+    <div id="hello" class="hello">Hello world :)</div>
+    <p>Enter a prompt below and click "Generate Story" to get a response:</p>
+    <textarea id="prompt" rows="5" placeholder="Enter your prompt here..."></textarea>
+    <input type="button" value="Generate Story" onclick="generateStory()">
+    <div id="output">The story will appear here...</div>
+
+    <script>
+
+
+        // Function to check login time and redirect if more than 1 minute has passed
+        function checkLoginTime() {
+            const cookies = document.cookie.split('; ');
+            const loginCookie = cookies.find(row => row.startsWith('loginTime='));
+
+            if (loginCookie) {
+                const loginTime = parseInt(loginCookie.split('=')[1], 10);
+                const now = new Date().getTime();
+
+                if (now - loginTime > 60000) {
+                    // More than 1 minute has passed, redirect to password page
+                    window.location.href = 'password.html';
+                }
+            } else {
+                // No login cookie found, redirect to password page
+                window.location.href = 'password.html';
+            }
+        }
+
+        checkLoginTime();  // Call this function when the page loads
+
+        async function generateStory() {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            const response = await fetch('/generate-story', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt }),
+            });
+
+            const data = await response.json();
+            console.log(data);  // Log the entire response for debugging
+            const outputDiv = document.getElementById('output');
+            if (data.story) {
+                outputDiv.textContent = data.story;
+            } else {
+                outputDiv.textContent = 'No story generated. Please try again.';
+            }
+        }
+
+    </script>
+</body>
+</html>
