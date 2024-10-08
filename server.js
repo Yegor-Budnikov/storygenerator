@@ -56,7 +56,7 @@ app.post('/generate-story', async (req, res) => {
             {
                 model: 'gpt-3.5-turbo',  // Use a chat-based model
                 messages: [
-                    { role: 'system', content: 'You are a helpful assistant that writes creative stories.' },  // Optional system message
+                    { role: 'system', content: 'You are a helpful assistant that writes creative stories. For example, bedtime fairytales. If there are no other contradicting instructions, write a short and light story with less than 500 words.' },  // Optional system message
                     { role: 'user', content: prompt }  // User-provided prompt for the story
                 ],
                 max_tokens: 500,

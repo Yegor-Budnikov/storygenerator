@@ -28,7 +28,9 @@
 <body>
     <h1>Welcome to the Story Generator</h1>
     <p>Enter a prompt below and click "Generate Story" to get a response:</p>
-    <textarea id="prompt" rows="5" placeholder="Enter your prompt here..."></textarea>
+    <textarea id="prompt" rows="5" placeholder="Enter your prompt here, for example, names of the main characters, their backstory, any details that you want to see in the story...
+
+You don't have to. The prompt is optional. If you don't have anything in mind just click the button below:)"></textarea>
     <input type="button" value="Generate Story" onclick="generateStory()">
     <div id="output">The story will appear here...</div>
     <input type="button" value="Copy to Clipboard" onclick="copyToClipboard()">
@@ -59,10 +61,11 @@
 
         async function generateStory() {
             const prompt = document.getElementById('prompt').value;
-            if (!prompt) {
+            //commenting the check that prompt is not empty
+            /*if (!prompt) {
                 alert('Please enter a prompt');
                 return;
-            }
+            }*/
 
             const response = await fetch('/generate-story', {
                 method: 'POST',
