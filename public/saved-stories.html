@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Stories</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .story {
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .story h3 {
+            margin: 0;
+        }
+        .nav-menu {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Saved Stories</h1>
+
+    <div class="nav-menu">
+        <select id="navMenu" onchange="navigatePage()">
+            <option value="saved">View Saved Stories</option>
+            <option value="generate">Generate Story</option>
+        </select>
+    </div>
+
+    <div id="stories"></div>
+
+    <script>
+        function navigatePage() {
+            const selectedPage = document.getElementById('navMenu').value;
+            if (selectedPage === 'generate') {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function loadStories() {
+            const savedStories = JSON.parse(localStorage.getItem('savedStories')) || [];
+            const storiesDiv = document.getElementById('stories');
+
+            if (savedStories.length === 0) {
+                storiesDiv.innerHTML = '<p>No stories saved yet.</p>';
+                return;
+            }
+
+            savedStories.forEach((story, index) => {
+                const storyDiv = document.createElement('div');
+                storyDiv.classList.add('story');
+
+                storyDiv.innerHTML = `
+                    <h3>${story.title}</h3>
+                    <p>${story.content}</p>
+                    <button onclick="deleteStory(${index})">Delete</button>
+                `;
+
+                storiesDiv.appendChild(storyDiv);
+            });
+        }
+
+        function deleteStory(index) {
+            const savedStories = JSON.parse(localStorage.getItem('savedStories')) || [];
+            savedStories.splice(index, 1);
+            localStorage.setItem('savedStories', JSON.stringify(savedStories));
+            loadStories();
+        }
+
+        window.onload = loadStories;
+    </script>
+
+</body>
+</html>

@@ -7,6 +7,10 @@ dotenv.config();
 
 const app = express();
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+
 // Use the environment variable PORT or default to 3000
 const PORT = process.env.PORT || 3000;
 
@@ -18,19 +22,35 @@ const correctPassword = process.env.PASSWORD;
 
 // Default route serves the password page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/password.html'));
+    const loginTime = req.cookies.loginTime;
+    const currentTime = new Date().getTime();
+
+    console.log('loginTime:', loginTime);
+    console.log('currentTime:', currentTime);
+
+    if (loginTime && currentTime - loginTime < 60 * 1000) {
+        console.log('Redirecting to story generator page.');
+        res.redirect('/index.html');
+    } else {
+        console.log('Serving password page.');
+        res.sendFile(path.join(__dirname, 'public', 'password.html'));
+    }
 });
+
 
 // Validate password route
 app.post('/validate-password', (req, res) => {
     const { password } = req.body;
 
-    if (password === correctPassword) {
+    if (password === process.env.PASSWORD) {
+        const loginTime = new Date().getTime();
+        res.cookie('loginTime', loginTime, { maxAge: 60 * 1000 });  // Set cookie for 1 minute
         res.json({ success: true });
     } else {
-        res.json({ success: false });
+        res.status(401).json({ success: false, message: 'Invalid password' });
     }
 });
+
 
 // Serve index.html only after password validation
 app.get('/index.html', (req, res) => {
@@ -86,3 +106,4 @@ app.post('/generate-story', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+

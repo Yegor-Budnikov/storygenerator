@@ -19,53 +19,46 @@
         #output {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 250px;  /* Keep a fixed height */
-            overflow-y: auto;  /* Add a scrollbar when the content exceeds the height */
-            white-space: pre-wrap;  /* Preserve spaces and line breaks */
-    }
+            height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .nav-menu {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
+
     <h1>Welcome to the Story Generator</h1>
+
+    <div class="nav-menu">
+        <select id="navMenu" onchange="navigatePage()">
+            <option value="generate">Generate Story</option>
+            <option value="saved">View Saved Stories</option>
+        </select>
+    </div>
+
     <p>Enter a prompt below and click "Generate Story" to get a response:</p>
-    <textarea id="prompt" rows="5" placeholder="Enter your prompt here, for example, names of the main characters, their backstory, any details that you want to see in the story...
+   <textarea id="prompt" rows="5" placeholder="Enter your prompt here, for example, names of the main characters, their backstory, any details that you want to see in the story...
 
 You don't have to. The prompt is optional. If you don't have anything in mind just click the button below:)"></textarea>
     <input type="button" value="Generate Story" onclick="generateStory()">
     <div id="output">The story will appear here...</div>
     <input type="button" value="Copy to Clipboard" onclick="copyToClipboard()">
+    <input type="button" value="Save the Story" onclick="saveStory()">
 
     <script>
 
-
-        // Function to check login time and redirect if more than 1 minute has passed
-        function checkLoginTime() {
-            const cookies = document.cookie.split('; ');
-            const loginCookie = cookies.find(row => row.startsWith('loginTime='));
-
-            if (loginCookie) {
-                const loginTime = parseInt(loginCookie.split('=')[1], 10);
-                const now = new Date().getTime();
-
-                if (now - loginTime > 60000) {
-                    // More than 1 minute has passed, redirect to password page
-                    window.location.href = 'password.html';
-                }
-            } else {
-                // No login cookie found, redirect to password page
-                window.location.href = 'password.html';
+        function navigatePage() {
+            const selectedPage = document.getElementById('navMenu').value;
+            if (selectedPage === 'saved') {
+                window.location.href = 'saved-stories.html';
             }
         }
 
-        checkLoginTime();  // Call this function when the page loads
-
         async function generateStory() {
             const prompt = document.getElementById('prompt').value;
-            //commenting the check that prompt is not empty
-            /*if (!prompt) {
-                alert('Please enter a prompt');
-                return;
-            }*/
 
             const response = await fetch('/generate-story', {
                 method: 'POST',
@@ -76,7 +69,6 @@ You don't have to. The prompt is optional. If you don't have anything in mind ju
             });
 
             const data = await response.json();
-            console.log(data);  // Log the entire response for debugging
             const outputDiv = document.getElementById('output');
             if (data.story) {
                 outputDiv.textContent = data.story;
@@ -84,7 +76,7 @@ You don't have to. The prompt is optional. If you don't have anything in mind ju
                 outputDiv.textContent = 'No story generated. Please try again.';
             }
         }
-        // Function to copy the generated story to clipboard
+
         function copyToClipboard() {
             const storyText = document.getElementById('output').textContent;
             const tempInput = document.createElement('textarea');
@@ -96,6 +88,28 @@ You don't have to. The prompt is optional. If you don't have anything in mind ju
             alert('Story copied to clipboard!');
         }
 
+        function saveStory() {
+            const storyText = document.getElementById('output').textContent;
+            if (!storyText) {
+                alert('No story to save.');
+                return;
+            }
+
+            const savedStories = JSON.parse(localStorage.getItem('savedStories')) || [];
+
+            if (savedStories.some(story => story.content === storyText)) {
+                alert('This story is already saved.');
+                return;
+            }
+
+            const timestamp = new Date().toLocaleString(); 
+            savedStories.push({ title: timestamp, content: storyText });
+            localStorage.setItem('savedStories', JSON.stringify(savedStories));
+
+            alert('Story saved successfully!');
+        }
+
     </script>
+
 </body>
 </html>
