@@ -26,6 +26,10 @@
         .nav-menu {
             margin-bottom: 20px;
         }
+        .filter-label {
+            text-align: left;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -38,6 +42,59 @@
             <option value="saved">View Saved Stories</option>
         </select>
     </div>
+
+    <p>Select filters for your story:</p>
+    
+     <!-- Filters Section (Each filter on a new line) -->
+    <div>
+        <label for="style" class="filter-label">Style:</label>
+        <select id="style">
+            <option value="none">Any</option>
+            <option value="humorous">Humorous</option>
+            <option value="dramatic">Dramatic</option>
+            <option value="whimsical">Whimsical</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="complexity" class="filter-label">Complexity:</label>
+        <select id="complexity">
+            <option value="none">Any</option>
+            <option value="simple">Simple</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="complex">Complex</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="length" class="filter-label">Length:</label>
+        <select id="length">
+            <option value="none">Any</option>
+            <option value="short">Short</option>
+            <option value="medium">Medium</option>
+            <option value="long">Long</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="characters" class="filter-label">Character Types:</label>
+        <select id="characters">
+            <option value="none">Any</option>
+            <option value="animals">Animals</option>
+            <option value="people">People</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="plot" class="filter-label">Plot Structure:</label>
+        <select id="plot">
+            <option value="none">Any</option>
+            <option value="linear">Linear</option>
+            <option value="nonlinear">Non-linear</option>
+            <option value="twist">Twist Ending</option>
+        </select>
+    </div>
+
 
     <p>Enter a prompt below and click "Generate Story" to get a response:</p>
    <textarea id="prompt" rows="5" placeholder="Enter your prompt here, for example, names of the main characters, their backstory, any details that you want to see in the story...
@@ -60,13 +117,30 @@ You don't have to. The prompt is optional. If you don't have anything in mind ju
         async function generateStory() {
             const prompt = document.getElementById('prompt').value;
 
+            // Get filter values
+            const style = document.getElementById('style').value;
+            const complexity = document.getElementById('complexity').value;
+            const length = document.getElementById('length').value;
+            const characters = document.getElementById('characters').value;
+            const plot = document.getElementById('plot').value;
+
+
+            // Send filters along with the prompt to the server
             const response = await fetch('/generate-story', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prompt }),
+                body: JSON.stringify({
+                    prompt,
+                    style,
+                    complexity,
+                    length,
+                    characters,
+                    plot
+                }),
             });
+
 
             const data = await response.json();
             const outputDiv = document.getElementById('output');

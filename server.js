@@ -68,7 +68,15 @@ const openaiApiKey = process.env.OPENAI_API_KEY;
 // Route to handle generating a story
 app.post('/generate-story', async (req, res) => {
     console.log('Received request:', req.body);
-    const { prompt } = req.body;
+    const { prompt, style, complexity, length, characters, plot } = req.body;
+
+    // Construct the full prompt including the selected filters
+    let fullPrompt = prompt;
+    if (style !== 'none') fullPrompt += `. The style of a story should be sould be in a ${style} style`;
+    if (complexity !== 'none') fullPrompt += `. The complexity sould be ${complexity}`;
+    if (length !== 'none') fullPrompt += `. The length should be ${length}, ignore the specific numbers mentioned before`;
+    if (characters !== 'none') fullPrompt += `. The story should be featuring ${characters}`;
+    if (plot !== 'none') fullPrompt += `. The plot should have a ${plot} structure`;
 
     try {
         const apiResponse = await axios.post(
@@ -77,7 +85,7 @@ app.post('/generate-story', async (req, res) => {
                 model: 'gpt-3.5-turbo',  // Use a chat-based model
                 messages: [
                     { role: 'system', content: 'You are a helpful assistant that writes creative stories. For example, bedtime fairytales. If there are no other contradicting instructions, write a short and light story with less than 500 words.' },  // Optional system message
-                    { role: 'user', content: prompt }  // User-provided prompt for the story
+                    { role: 'user', content: fullPrompt }  // User-provided prompt for the story
                 ],
                 max_tokens: 500,
             },
