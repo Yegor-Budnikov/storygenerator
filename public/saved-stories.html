@@ -45,9 +45,12 @@
             }
         }
 
+        // Load stories from localStorage
         function loadStories() {
             const savedStories = JSON.parse(localStorage.getItem('savedStories')) || [];
             const storiesDiv = document.getElementById('stories');
+            
+            storiesDiv.innerHTML = '';  // Clear the stories div
 
             if (savedStories.length === 0) {
                 storiesDiv.innerHTML = '<p>No stories saved yet.</p>';
@@ -68,13 +71,15 @@
             });
         }
 
+        // Delete a story from localStorage and refresh the list
         function deleteStory(index) {
             const savedStories = JSON.parse(localStorage.getItem('savedStories')) || [];
-            savedStories.splice(index, 1);
-            localStorage.setItem('savedStories', JSON.stringify(savedStories));
-            loadStories();
+            savedStories.splice(index, 1);  // Remove the story from the array
+            localStorage.setItem('savedStories', JSON.stringify(savedStories));  // Update localStorage
+            loadStories();  // Reload the list of stories
         }
 
+        // Load stories when the page loads
         window.onload = loadStories;
     </script>
 

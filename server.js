@@ -14,6 +14,19 @@ app.use(cookieParser());
 // Use the environment variable PORT or default to 3000
 const PORT = process.env.PORT || 3000;
 
+
+// Middleware to enforce password protection
+function enforcePassword(req, res, next) {
+    const loginTime = req.cookies.loginTime;
+    const currentTime = new Date().getTime();
+
+    // If loginTime doesn't exist or the session has expired (e.g., 1 minute)
+    if (!loginTime || currentTime - loginTime > 60 * 1000) {
+        return res.redirect('/password.html');
+    }
+    next();
+}
+
 app.use(express.json());  // For parsing JSON requests
 
 // Secure password stored in .env
@@ -21,40 +34,34 @@ const correctPassword = process.env.PASSWORD;
 
 
 // Default route serves the password page
+// Serve the password page as default if not authenticated
 app.get('/', (req, res) => {
-    const loginTime = req.cookies.loginTime;
-    const currentTime = new Date().getTime();
-
-    console.log('loginTime:', loginTime);
-    console.log('currentTime:', currentTime);
-
-    if (loginTime && currentTime - loginTime < 60 * 1000) {
-        console.log('Redirecting to story generator page.');
-        res.redirect('/index.html');
-    } else {
-        console.log('Serving password page.');
-        res.sendFile(path.join(__dirname, 'public', 'password.html'));
-    }
+    res.redirect('/password.html');
 });
 
-
-// Validate password route
+// Password validation route
 app.post('/validate-password', (req, res) => {
     const { password } = req.body;
 
+    // Check password against environment variable
     if (password === process.env.PASSWORD) {
+        // Set a cookie with the current login time
         const loginTime = new Date().getTime();
-        res.cookie('loginTime', loginTime, { maxAge: 60 * 1000 });  // Set cookie for 1 minute
+        res.cookie('loginTime', loginTime, { maxAge: 60 * 1000 });  // Cookie valid for 1 minute
         res.json({ success: true });
     } else {
         res.status(401).json({ success: false, message: 'Invalid password' });
     }
 });
 
-
 // Serve index.html only after password validation
-app.get('/index.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/index.html'));
+// Protect the following routes using the enforcePassword middleware
+app.get('/index.html', enforcePassword, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/saved-stories.html', enforcePassword, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'saved-stories.html'));
 });
 
 app.use(express.static('public'));  // Serve the static HTML
@@ -110,6 +117,22 @@ app.post('/generate-story', async (req, res) => {
         res.status(500).json({ error: 'Failed to generate story' });
     }
 });
+
+app.delete('/api/stories/:id', async (req, res) => {
+    try {
+        const storyId = req.params.id;
+        const deletedStory = await Story.findByIdAndDelete(storyId);
+
+        if (!deletedStory) {
+            return res.status(404).json({ message: 'Story not found' });
+        }
+
+        res.json({ message: 'Story deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to delete the story' });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
