@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple ChatGPT Web App</title>
+    <title>Story Generator 0.1</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -95,6 +95,22 @@
         </select>
     </div>
 
+    <div>
+        <label for="scriptStyle" class="filter-label">Script Style:</label>
+        <select id="scriptStyle">
+            <option value="none">Any</option>
+            <option value="million-dollar">"The Million-Dollar Story"</option>
+            <option value="save-the-cat">"Save the Cat! beat sheet"</option>
+            <option value="heros-journey">"The Hero's Journey"</option>
+            <option value="three-act">"The Three-Act Structure"</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="customScript" class="filter-label">Custom Script Style (Movie or Genre):</label>
+        <input type="text" id="customScript" placeholder="Enter custom movie/script style...">
+    </div>
+
 
     <p>Enter a prompt below and click "Generate Story" to get a response:</p>
    <textarea id="prompt" rows="5" placeholder="Enter your prompt here, for example, names of the main characters, their backstory, any details that you want to see in the story...
@@ -123,7 +139,15 @@ You don't have to. The prompt is optional. If you don't have anything in mind ju
             const length = document.getElementById('length').value;
             const characters = document.getElementById('characters').value;
             const plot = document.getElementById('plot').value;
+            const scriptStyle = document.getElementById('scriptStyle').value;
+            const customScript = document.getElementById('customScript').value;
 
+            // Ensure that values are sent correctly to the server
+            console.log({
+                prompt,
+                scriptStyle,
+                customScript
+            });
 
             // Send filters along with the prompt to the server
             const response = await fetch('/generate-story', {
@@ -137,7 +161,9 @@ You don't have to. The prompt is optional. If you don't have anything in mind ju
                     complexity,
                     length,
                     characters,
-                    plot
+                    plot,
+                    scriptStyle,
+                    customScript
                 }),
             });
 

@@ -75,7 +75,7 @@ const openaiApiKey = process.env.OPENAI_API_KEY;
 // Route to handle generating a story
 app.post('/generate-story', async (req, res) => {
     console.log('Received request:', req.body);
-    const { prompt, style, complexity, length, characters, plot } = req.body;
+    const { prompt, style, complexity, length, characters, plot, scriptStyle, customScript } = req.body;
 
     // Construct the full prompt including the selected filters
     let fullPrompt = prompt;
@@ -84,7 +84,8 @@ app.post('/generate-story', async (req, res) => {
     if (length !== 'none') fullPrompt += `. The length should be ${length}, ignore the specific numbers mentioned before`;
     if (characters !== 'none') fullPrompt += `. The story should be featuring ${characters}`;
     if (plot !== 'none') fullPrompt += `. The plot should have a ${plot} structure`;
-
+    if (scriptStyle !== 'none') fullPrompt += `. The plot should be following the structure inspired by ${scriptStyle}`;
+    if (typeof customScript === 'string' && customScript.trim() !== '') fullPrompt += ` in the style of the movie/genre "${customScript}"`;
     try {
         const apiResponse = await axios.post(
             'https://api.openai.com/v1/chat/completions',
